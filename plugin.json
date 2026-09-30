@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "itential-admin-skills",
+  "version": "0.1.0",
+  "description": "AI agent skills for administering the Itential Platform — platform health, adapter and application lifecycle, workflow engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content.",
+  "author": {
+    "name": "Itential"
+  },
+  "homepage": "https://github.com/itential/admin-skills",
+  "repository": "https://github.com/itential/admin-skills",
+  "license": "AGPL-3.0",
+  "keywords": [
+    "itential",
+    "network-automation",
+    "platform-administration",
+    "iam",
+    "sso",
+    "adapters"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Itential Admin Skills",
+        "shortDescription": "Administer the Itential Platform: health, adapters, access and SSO",
+        "longDescription": "AI agent skills for administering the Itential Platform — platform health, adapter and application lifecycle, workflow engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content.",
+        "developerName": "Itential",
+        "category": "Automation",
+        "websiteURL": "https://www.itential.com",
+        "defaultPrompt": [
+          "Check the health of my Itential platform",
+          "Restart the adapters that are offline",
+          "Create a read-only service account for CI",
+          "Set up SSO for my platform"
+        ]
+      }
+    }
+  }
+}
