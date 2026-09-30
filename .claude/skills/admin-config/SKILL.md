@@ -543,3 +543,4 @@ This applies the profile's saved adapter/app configurations. Use for switching b
 7. Build workflow with app=versionId, adapter_id=instanceName
 8. POST /operations-manager/jobs/start                         → run it
 ```
+<!-- E2 -->
