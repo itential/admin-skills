@@ -61,3 +61,4 @@ On `main`: **Version Bump** opens a patch-bump PR after every merge; **Release D
 | Cursor | `gh skill install … --agent cursor --all` | `/admin-platform` |
 
 Exact commands: `docs/vendor-install.md`. Customization: `docs/customization.md`.
+<!-- E5 -->
