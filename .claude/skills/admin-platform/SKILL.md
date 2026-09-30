@@ -36,8 +36,6 @@ rules or put credentials in committed files.
 
 ## Gotchas
 
-<!-- pipeline experiment E1 (itential/admin-skills sandbox): safe to remove -->
-
 - `GET /health/adapters` returns `{results: [...]}` — adapters are in the `results` array
 - `GET /health/applications` also returns `{results: [...]}` — same shape
 - Adapter lifecycle is `PUT` not `POST`: `PUT /adapters/{name}/restart`
