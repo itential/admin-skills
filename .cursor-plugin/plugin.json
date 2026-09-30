@@ -1,7 +1,7 @@
 {
   "name": "itential-admin-skills",
   "displayName": "Itential Admin Skills",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "AI agent skills for administering the Itential Platform — platform health, adapter and application lifecycle, workflow engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content.",
   "author": {
     "name": "Itential",
