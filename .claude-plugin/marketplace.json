@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "AI agent skills for administering the Itential Platform \u2014 platform health, adapter and application lifecycle, workflow engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content.",
-    "version": "0.1.1"
+    "version": "0.1.2"
   },
   "plugins": [
     {
       "name": "itential-admin-skills",
       "source": "./",
       "description": "AI agent skills for administering the Itential Platform \u2014 platform health, adapter and application lifecycle, workflow engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content.",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "author": {
         "name": "Itential"
       },
