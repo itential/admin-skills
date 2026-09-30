@@ -1,0 +1,17 @@
+{
+  "name": "itential-admin-skills",
+  "owner": {
+    "name": "Itential"
+  },
+  "plugins": [
+    {
+      "name": "itential-admin-skills",
+      "source": "./",
+      "description": "Itential Admin Skills — administer the Itential Platform",
+      "version": "0.1.0",
+      "author": {
+        "name": "Itential"
+      }
+    }
+  ]
+}
