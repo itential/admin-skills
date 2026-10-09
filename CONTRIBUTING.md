@@ -31,7 +31,3 @@ git commit -am "chore: release v0.2.0"
 ```
 
 After it merges, publish the draft release on GitHub with the matching tag (`v0.2.0`). **Manifest Versions** fails any PR where the manifests disagree.
-
-## Testing against a platform
-
-`tests/` has scripts that exercise the skills' API calls against a live platform — see `tests/README.md`.

@@ -22,7 +22,6 @@ One folder of skills, read directly by every harness's installer — no per-tool
 | `skills/<name>/agents/openai.yaml` | Codex display metadata for the skill |
 | `skills/<name>/custom/{org,team,dev}/` | Customer customizations — always empty in Itential's repo |
 | `AGENTS.md` | Repo guide read by every agent (`CLAUDE.md` imports it) |
-| `customizations/{org,team,developer}/` | Repo-wide layer for a team's own clone |
 | Manifests | `.claude-plugin/` (Claude Code), root `plugin.json` (Agent Plugins v1.0.0 — Codex, Copilot, VS Code; Codex display under `extensions["com.openai"]`), `.cursor-plugin/` (Cursor), `.agents/plugins/marketplace.json` (Codex marketplace). Every marketplace entry points at `"./"` / `"."` so an org's copy installs itself. |
 
 Shared files: if several skills ever need the same file, keep it in a shared library folder and let `scripts/bundle_skill_assets.py` copy it into each skill's `assets/` (run `scripts/check-generated.sh` and commit the result). None needed today.

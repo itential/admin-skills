@@ -18,8 +18,3 @@ use-cases/
 # custom/org/ and custom/team/ are meant to be committed in a customer's copy.
 skills/*/custom/dev/*
 !skills/*/custom/dev/.gitkeep
-
-# customizations/developer/ is personal too (examples are shared)
-customizations/developer/*
-!customizations/developer/README.md
-!customizations/developer/*.example.md
