@@ -6,19 +6,11 @@
 
 > ## Customization Layers
 >
-> Two mechanisms, both checked before acting. Numbered in precedence order, highest first — most specific wins:
->
-> **Per-skill** (`skills/<name>/custom/` — `org`/`team` committed in a customer's own copy of this repo, `dev` personal and gitignored; always empty upstream — see `docs/customization.md`):
+> Each skill's `skills/<name>/custom/` folder — `org`/`team` committed in a customer's own copy of this repo, `dev` personal and gitignored; always empty upstream (see `docs/customization.md`). Checked before acting, in precedence order, highest first:
 > 1. `skills/<name>/custom/dev/`
 > 2. `skills/<name>/custom/team/`
 > 3. `skills/<name>/custom/org/`
->
-> **Repo-wide** (`customizations/` — an internal team customizing their own clone of this repo):
-> 4. `customizations/developer/`
-> 5. `customizations/team/`
-> 6. `customizations/org/`
->
-> 7. Core guidance — `AGENTS.md`, `skills/` — lowest priority. Everything above may narrow or override it, but must not weaken a skill's safety rules or put credentials in committed files.
+> 4. Core guidance — `AGENTS.md`, `skills/` — lowest priority. Everything above may narrow or override it, but must not weaken a skill's safety rules or put credentials in committed files.
 
 This project contains skills for administering the Itential Platform. The admin persona focuses on platform health, user management, access control, and configuration — not building workflows.
 

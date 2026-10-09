@@ -152,20 +152,6 @@ Skills land in the project's `.agents/skills/`, which Cursor reads.
 
 ---
 
-## One script for any tool
-
-`scripts/install-for-agent.sh` (from a clone of this repo) wraps `gh skill install` for any tool, so you don't have to remember per-tool commands. Needs GitHub CLI 2.90 or later.
-
-```bash
-scripts/install-for-agent.sh                                  # asks which tool
-scripts/install-for-agent.sh cursor                           # install into this project
-scripts/install-for-agent.sh cursor --update                  # update
-scripts/install-for-agent.sh cursor --version v0.1.0          # pin a release (tag or commit SHA)
-scripts/install-for-agent.sh cursor --repo acme/admin-skills # install from your org's copy
-```
-
----
-
 ## Switching to your own copy
 
 Once your org has a customized copy (see [`customization.md`](customization.md)), remove the Itential install and install from the copy:

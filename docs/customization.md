@@ -44,7 +44,7 @@ Itential's own maintenance workflows (release notes, PR checks) switch themselve
 |---|---|---|
 | Company policy — wrong for any team to do differently | `org/` | "Never delete a built-in role or group" |
 | A convention your team agreed on | `team/` | "Our service accounts are named `svc-netops-<purpose>`" |
-| Just yours — your sandbox, your test device, an experiment | `dev/` — see [Personal settings](#personal-settings-dev) | "My sandbox platform is `https://dev-ankit.itential.io`" |
+| Just yours — your sandbox, your test device, an experiment | `dev/` — see [Personal settings](#personal-settings-dev) | "My sandbox platform is `https://dev.example.itential.io`" |
 
 ### Write it
 
@@ -131,8 +131,6 @@ Always edit under `skills/<name>/custom/`. If a skill has an `assets/` folder, i
 ### Which rule wins
 
 More specific wins: `dev` over `team` over `org` over the skill's own defaults. Rules that don't conflict all apply together. Two files in the same layer shouldn't contradict each other — if they do, fix the files.
-
-The repo also has a repo-wide `customizations/` folder, used by Itential's internal team; see `AGENTS.md` → Customization Layers for how it combines with the per-skill folders.
 
 ### Troubleshooting
 
