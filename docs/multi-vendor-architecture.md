@@ -39,7 +39,7 @@ PR checks (required on `main`):
 | Manifest Versions (`scripts/bump_version.py --check`) | the plugin manifests disagree on version |
 | Custom folders empty (`scripts/check-custom-empty.sh`) | a PR adds real content under `skills/*/custom/` |
 
-On `main`: **Version Bump** opens a patch-bump PR after each merge, and **Release Drafter** keeps a draft release — both only in `itential/admin-skills`, not in customer copies. (Bot-opened PRs need a token that triggers checks, or a maintainer close/reopen — see `docs/ci-learnings.md`.)
+On `main`: **Release Drafter** keeps a draft of the next release's notes (only in `itential/admin-skills`). There are no bots that open PRs. Versions are bumped by hand when releasing — see `CONTRIBUTING.md` → Releasing.
 
 ## Install & invoke
 

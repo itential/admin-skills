@@ -28,7 +28,7 @@ cd .. && rm -rf admin-skills.git
 
 (Or use GitHub's **Import repository** page with `https://github.com/itential/admin-skills`.)
 
-Itential's own maintenance workflows (version bumps, release notes, PR checks) switch themselves off in your copy, so there's nothing to configure.
+Itential's own maintenance workflows (release notes, PR checks) switch themselves off in your copy, so there's nothing to configure.
 
 ---
 
