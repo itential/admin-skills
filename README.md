@@ -68,7 +68,7 @@ skills/<skill-name>/
     └── dev/          ← personal settings (not committed)
 ```
 
-An admin makes a private copy of this repo, the team commits markdown rules under the right skill's `custom/` folder, a pipeline in the repo delivers them to every AI tool, and everyone installs from the org's copy. Step by step: [`docs/customization.md`](docs/customization.md).
+An admin makes a private copy of this repo, the team commits markdown rules under the right skill's `custom/` folder, and everyone installs from the org's copy — the rules come with every install. Step by step: [`docs/customization.md`](docs/customization.md).
 
 ---
 

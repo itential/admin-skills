@@ -74,16 +74,14 @@ jobs:
 
           echo "All $count commit(s) conform to conventional commits."
 
-  mirror-edits:
-    name: Generated Copies Untouched
+  skills-valid:
+    name: Skills Valid
     if: github.repository == 'itential/admin-skills'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Fail if .claude/.agents/.github skills were edited instead of skills/
-        run: scripts/check-mirror-edits.sh "origin/${{ github.base_ref }}"
+      - name: Skill file references resolve and bundled assets are current
+        run: scripts/check-generated.sh
 
   manifest-versions:
     name: Manifest Versions

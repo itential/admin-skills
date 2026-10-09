@@ -1,5 +1,0 @@
-# Codex skill metadata (display in /skills and the plugin UI).
-interface:
-  display_name: "Platform Configuration"
-  short_description: "Manage users, groups, roles, service accounts, SSO and integrations"
-  default_prompt: "Create a service account for our CI pipeline with read-only access"

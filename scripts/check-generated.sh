@@ -1,16 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Validates skills and their bundled files. Runs the bundler, which fails if any
+# skill-relative path a SKILL.md mentions doesn't exist inside that skill, then fails
+# if skills/*/assets is out of date (commit the bundler's output in your PR).
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-"${ROOT_DIR}/scripts/generate-vendor-wrappers.sh" >/dev/null
-"${ROOT_DIR}/scripts/check-vendor-skills.sh" >/dev/null
+python3 "${ROOT_DIR}/scripts/bundle_skill_assets.py"
 
-GENERATED=(.claude/skills .agents/skills .github/skills ':(glob)skills/*/assets/**')
-if [[ -n "$(git -C "${ROOT_DIR}" status --porcelain -- "${GENERATED[@]}")" ]]; then
-  echo "Generated files are stale or untracked:" >&2
-  git -C "${ROOT_DIR}" status --short -- "${GENERATED[@]}" >&2
+if [[ -n "$(git -C "${ROOT_DIR}" status --porcelain -- skills)" ]]; then
+  echo "skills/*/assets is out of date -- run scripts/check-generated.sh locally and commit the result:" >&2
+  git -C "${ROOT_DIR}" status --short -- skills >&2
   exit 1
 fi
 
-echo "skills/*/assets, .claude/skills, .agents/skills, .github/skills are up to date."
+echo "Skills valid: every bundled-file reference resolves and skills/*/assets is up to date."

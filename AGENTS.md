@@ -1,6 +1,6 @@
 # Itential Platform — Admin Guide
 
-**Cross-tool note:** Canonical skill content: `skills/{skill-name}/SKILL.md`. CI (`.github/workflows/generate-mirrors.yml`) bundles any shared-library files a skill references into `skills/{skill-name}/assets/` and copies each complete skill into `.claude/skills/` (Claude Code), `.agents/skills/` (Codex CLI, Cursor, `gh skill`) and `.github/skills/` (GitHub Copilot) — all generated, edit `skills/` only. Plugin manifests: `.claude-plugin/` (Claude Code), root `plugin.json` (Codex, Copilot, VS Code), `.cursor-plugin/` (Cursor). Invoke: `/itential-admin-skills:skill-name` (Claude Code plugin), `/skill-name` (Claude Code clone, Copilot, Cursor), `$itential-admin-skills:skill-name` (Codex). See `docs/vendor-install.md`.
+**Cross-tool note:** Skills live in `skills/{skill-name}/SKILL.md`, each self-contained (any files it needs sit inside its own folder). Every install method reads `skills/` directly — there are no per-tool copies. Plugin manifests: `.claude-plugin/` (Claude Code), root `plugin.json` (Codex, Copilot, VS Code), `.cursor-plugin/` (Cursor). Invoke: `/itential-admin-skills:skill-name` (Claude Code), `$itential-admin-skills:skill-name` (Codex), `/skill-name` (Copilot, Cursor). See `docs/vendor-install.md`.
 
 **Paths:** skills refer to their files by paths relative to the skill's own folder (`assets/...`, `scripts/...`).
 
