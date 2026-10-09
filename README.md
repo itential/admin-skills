@@ -74,6 +74,20 @@ An admin makes a private copy of this repo, the team commits markdown rules unde
 
 ---
 
+## Related skill packs
+
+Itential publishes three skill packs. They install side by side, and each works on its own:
+
+| Pack | Repo | Plugin | For |
+|---|---|---|---|
+| **Builder** | [`itential/builder-skills`](https://github.com/itential/builder-skills) | `itential-builder` | Design, build and test automations — spec, feasibility, design, build, QA and as-built |
+| **Admin** (this repo) | [`itential/admin-skills`](https://github.com/itential/admin-skills) | `itential-admin-skills` | Platform health, adapters and applications, users, groups, roles, service accounts, SSO, integrations |
+| **Operator** | [`itential/operator-skills`](https://github.com/itential/operator-skills) | `itential-operator-skills` | Run automations, monitor jobs, diagnose and retry failures, approve manual tasks, manage triggers |
+
+Install any of them the same way — the commands in [`docs/vendor-install.md`](docs/vendor-install.md), with that pack's repo and plugin name.
+
+---
+
 ## Docs
 
 - [`docs/vendor-install.md`](docs/vendor-install.md) — install, run, update per tool
