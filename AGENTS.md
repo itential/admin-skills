@@ -31,7 +31,7 @@ This project contains skills for administering the Itential Platform. The admin 
 
 **Where the line is.** This pack looks after the platform itself. Running and monitoring automations day to day → **Operator**; designing, building or testing automations (including running jobs to test them) → **Builder**.
 
-If a request belongs to another pack, say which pack covers it and how to install it (`/plugin marketplace add <repo>` then `/plugin install <plugin>@<plugin>` in Claude Code; other tools in `docs/vendor-install.md`), rather than improvising from general knowledge. If that pack is already installed, use its skill.
+If a request belongs to another pack, say which pack covers it and point to that repo's `docs/vendor-install.md` for installing it in the tool being used, rather than improvising from general knowledge. If that pack is already installed, use its skill.
 
 ## Key Rules
 
