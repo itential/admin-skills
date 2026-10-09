@@ -44,7 +44,7 @@ Itential's own maintenance workflows (release notes, PR checks) switch themselve
 |---|---|---|
 | Company policy — wrong for any team to do differently | `org/` | "Never delete a built-in role or group" |
 | A convention your team agreed on | `team/` | "Our service accounts are named `svc-netops-<purpose>`" |
-| Just yours — your sandbox, your test device, an experiment | `dev/` — see [Personal settings](#personal-settings-dev) | "My sandbox platform is `https://dev-ankit.itential.io`" |
+| Just yours — your sandbox, your test device, an experiment | `dev/` — see [Personal settings](#personal-settings-dev) | "My sandbox platform is `https://dev.example.itential.io`" |
 
 ### Write it
 

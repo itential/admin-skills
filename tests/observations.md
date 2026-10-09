@@ -2,7 +2,7 @@
 
 ## Date: 2026-03-04
 
-## What We Learned
+## Findings
 
 ### Integration Model vs Adapter (Code-based vs Codeless)
 
