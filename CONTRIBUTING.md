@@ -1,5 +1,7 @@
 # Contributing
 
+Before your first pull request, sign the [Contributor License Agreement](CLA.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately — see [SECURITY.md](SECURITY.md).
+
 Pull requests into `main` must pass **Skills Valid**, **Manifest Versions** and **Custom folders empty** (see `.github/workflows/`). **Branch Naming** also runs and reports, but doesn't block a merge.
 
 ## Branch names
@@ -20,6 +22,10 @@ PRs are squash-merged, so the PR title becomes the commit on `main` and the line
 
 Before pushing, run `python3 scripts/check-skills.py` — the same check CI runs.
 
+## Changelog
+
+If your PR is user-facing (a new or changed skill, a fixed bug, a behavior change), add a bullet under `## Unreleased` in `CHANGELOG.md`, starting with `Added`, `Fixed`, `Changed` or `Removed`. Skip it for docs and chores.
+
 ## Releasing
 
 Versions are bumped by hand, in their own PR, when a release is wanted:
@@ -27,6 +33,7 @@ Versions are bumped by hand, in their own PR, when a release is wanted:
 ```bash
 git checkout -b chore/release-0-2-0
 python3 scripts/bump_version.py --bump minor      # or patch / major — updates every manifest
+# rename "## Unreleased" in CHANGELOG.md to "## 0.2.0" and add a new empty "## Unreleased"
 git commit -am "chore: release v0.2.0"
 ```
 

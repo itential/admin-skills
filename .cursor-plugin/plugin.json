@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/itential/admin-skills",
   "repository": "https://github.com/itential/admin-skills",
-  "license": "AGPL-3.0",
+  "license": "GPL-3.0-or-later",
   "keywords": [
     "itential",
     "network-automation",

@@ -1,5 +1,7 @@
 # Itential — Admin Skills
 
+[![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+
 AI agent skills for **administering the Itential Platform**: platform health, adapter and application lifecycle, workflow-engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content. Works in Claude Code, Codex CLI, GitHub Copilot (CLI and VS Code) and Cursor.
 
 | Skill | Use it for |
@@ -78,8 +80,18 @@ An admin makes a private copy of this repo, the team commits markdown rules unde
 - [`docs/customization.md`](docs/customization.md) — add your org's rules and keep them across updates
 - [`docs/multi-vendor-architecture.md`](docs/multi-vendor-architecture.md) — how every harness installs from `skills/`, and the CI checks
 - [`AGENTS.md`](AGENTS.md) — the guide every agent reads first
-- [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch and commit conventions
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — how to contribute, PR checks, and releasing
+- [`CHANGELOG.md`](CHANGELOG.md) — what changed in each release
+
+## Contributing
+
+Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) to get started. Before contributing, you'll need to sign our [Contributor License Agreement](CLA.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Support
+
+- **Bug reports and questions**: [Open an issue](https://github.com/itential/admin-skills/issues/new/choose)
+- **Security issues**: see [SECURITY.md](SECURITY.md) — please don't open a public issue
 
 ## License
 
-[AGPL-3.0](LICENSE)
+This project is licensed under the GNU General Public License v3.0 — see the [LICENSE](LICENSE) file for details.

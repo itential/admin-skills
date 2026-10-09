@@ -5,8 +5,10 @@ For each skills/<name>/SKILL.md:
   - it starts with YAML frontmatter that has `name` and `description`;
   - `name` equals the folder name and is kebab-case (max 64 characters);
   - `description` is non-empty and at most 1024 characters;
-  - every skill-relative file it mentions (assets/..., scripts/..., references/...)
-    exists inside the skill's own folder -- installers copy only that folder.
+  - every skill-relative file it mentions (assets/..., scripts/....py|.sh, references/...)
+    exists inside the skill's own folder -- installers copy only that folder. Patterns
+    such as assets/<name>.json or assets/.../ALL_CAPS_NAME.json are skipped, and so are
+    scripts/ paths that aren't .py or .sh (those point into the user's own project).
 Also checks that agents/openai.yaml, if present, has an `interface:` block.
 
 Run by the Skills Valid PR check; usage: python3 scripts/check-skills.py
@@ -18,7 +20,7 @@ from pathlib import Path
 SKILLS = Path(__file__).resolve().parent.parent / "skills"
 NAME = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 REF = re.compile(r"(?<![\w/.-])((?:assets|scripts|references)/[A-Za-z0-9_.\-/]*[A-Za-z0-9_\-])")
-PLACEHOLDER = re.compile(r"[<{*]")
+PLACEHOLDER = re.compile(r"[<{*]|(^|/)[A-Z][A-Z0-9_]+(\.|/|$)")
 
 
 def frontmatter(text: str) -> dict[str, str] | None:
@@ -60,8 +62,10 @@ def check(skill: Path) -> list[str]:
     for m in REF.finditer(text):
         rel = m.group(1)
         nxt = text[m.end():m.end() + 1]
-        if (nxt and nxt in "<{*") or PLACEHOLDER.search(rel):
+        if (nxt and nxt in "<{*") or PLACEHOLDER.search(rel.replace("AGENTS.md", "")):
             continue  # a pattern like assets/<name>.json, not a real file
+        if rel.startswith("scripts/") and not rel.endswith((".py", ".sh")):
+            continue  # e.g. the user's own scripts/requirements.txt, not a file in this skill
         if not (skill / rel).exists():
             problems.append(f"mentions {rel}, which isn't in the skill folder")
 
