@@ -126,7 +126,7 @@ skills/<skill-name>/
     └── dev/          ← personal, gitignored
 ```
 
-Always edit under `skills/<name>/custom/`. If a skill has an `assets/` folder, it's generated — edits there get overwritten.
+Always edit under `skills/<name>/custom/`.
 
 ### Which rule wins
 

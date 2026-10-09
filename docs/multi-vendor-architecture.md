@@ -24,21 +24,18 @@ One folder of skills, read directly by every harness's installer — no per-tool
 | `AGENTS.md` | Repo guide read by every agent (`CLAUDE.md` imports it) |
 | Manifests | `.claude-plugin/` (Claude Code), root `plugin.json` (Agent Plugins v1.0.0 — Codex, Copilot, VS Code; Codex display under `extensions["com.openai"]`), `.cursor-plugin/` (Cursor), `.agents/plugins/marketplace.json` (Codex marketplace). Every marketplace entry points at `"./"` / `"."` so an org's copy installs itself. |
 
-Shared files: if several skills ever need the same file, keep it in a shared library folder and let `scripts/bundle_skill_assets.py` copy it into each skill's `assets/` (run `scripts/check-generated.sh` and commit the result). None needed today.
-
 ## CI
 
-PR checks (required on `main`):
+PR checks:
 
-| Check | Fails when |
-|---|---|
-| Branch Naming | branch isn't `feature|fix|refactor|docs|chore/<kebab-case>` |
-| Commit Messages | a commit isn't conventional (`feat: …`, `fix: …`), or is a merge commit |
-| Skills Valid (`scripts/check-generated.sh`) | a skill references a file that isn't in its folder, or bundled `assets/` are out of date |
-| Manifest Versions (`scripts/bump_version.py --check`) | the plugin manifests disagree on version |
-| Custom folders empty (`scripts/check-custom-empty.sh`) | a PR adds real content under `skills/*/custom/` |
+| Check | Required | Fails when |
+|---|---|---|
+| Skills Valid (`scripts/check-skills.py`) | Yes | a skill's `name` doesn't match its folder, its `description` is missing or over 1024 characters, or it mentions a file that isn't in its folder |
+| Manifest Versions (`scripts/bump_version.py --check`) | Yes | the plugin manifests disagree on version |
+| Custom folders empty (`scripts/check-custom-empty.sh`) | Yes | a PR adds real content under `skills/*/custom/` |
+| Branch Naming | No — reports only | branch isn't `feature|fix|refactor|docs|chore/<kebab-case>` (the prefix sets the PR label) |
 
-On `main`: **Release Drafter** keeps a draft of the next release's notes (only in `itential/admin-skills`). There are no bots that open PRs. Versions are bumped by hand when releasing — see `CONTRIBUTING.md` → Releasing.
+On `main`: **Release Drafter** keeps a draft release named after the version in `plugin.json`, with notes grouped by PR label (only in `itential/admin-skills`). There are no bots that open PRs. Versions are bumped by hand when releasing — see `CONTRIBUTING.md` → Releasing.
 
 ## Install & invoke
 
