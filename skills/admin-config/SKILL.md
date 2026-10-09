@@ -34,13 +34,13 @@ rules or put credentials in committed files.
 
 - Auth endpoints return `{results: [...], total: N}` — NOT `{data: [...]}` or `{message, data, metadata}`
 - Account/group/role IDs are MongoDB ObjectIds (24-char hex)
-- `PATCH` for updates (accounts, groups, roles, service accounts), NOT `PUT`
+- `PATCH` for updates (accounts, groups, roles, service accounts), NOT `PUT` — and every one of these PATCH bodies is wrapped in `{updates: {...}}`
 - Groups use `{results: [...]}` not a plain array
 - Roles have `allowedMethods` — array of `{name, provenance}` objects defining what methods the role can call
 - Service account `client_id` IS the account `_id` — they're the same
 - Regenerating a service account secret: `PATCH /oauth/serviceAccounts/{client_id}/regenerate` — the old secret is permanently invalidated
 - SSO config names are unique identifiers (used in URL paths)
-- `DELETE` on accounts is NOT available via API — accounts can only be deactivated
+- `DELETE` on accounts is NOT available via API — deactivate instead: `PATCH /authorization/accounts/{id}` with `{updates: {inactive: true}}`
 - `forceLogout` requires the account ID, not the username
 - Integration `{name}` in URL paths must be URL-encoded (spaces, special chars)
 - Prebuilt import uses `POST /prebuilts/import` with the full prebuilt JSON
@@ -48,8 +48,7 @@ rules or put credentials in committed files.
 - Integration instances are **codeless** (`virtual: true`) — they do NOT show in `/health/adapters`, only in `/integrations`
 - Tasks only appear in palette **after the auto-created role is assigned to a group** the user belongs to
 - Group PATCH requires `{updates: {...}}` wrapper — bare fields return "No applicable updates requested"
-- Role create requires `{role: {...}}` wrapper
-- Group create requires `{group: {...}}` wrapper
+- Role create requires `{role: {...}}` wrapper, group create `{group: {...}}`, SSO config create/update `{config: {...}}`, prebuilt import `{prebuilt: {...}}`
 - `assignedRoles` in group PATCH is a **full replacement** — include ALL existing roles plus new ones
 - Default pagination is `limit=25`, API caps at `100` per page — always add `sort=_id&order=-1` when searching for recently-created resources (roles, accounts, groups, models, instances). MongoDB ObjectIds are time-ordered, so descending sort puts the newest items on page 1 instead of buried across hundreds of pages. Apply this to any paginated GET that's hunting for something just created.
 - Integration workflow tasks use `app` from `apps/list` (the versionId like `"Cat Facts:1.0.0"`), `adapter_id` is the instance name (like `"cat-facts"`)
@@ -96,15 +95,17 @@ PATCH /authorization/accounts/{accountId}
 ```
 ```json
 {
-  "memberOf": [
-    {"groupId": "67c85954abe686cf9cb78b2e", "aaaManaged": false}
-  ],
-  "assignedRoles": [
-    {"roleId": "683fb3733324ad98536b8caa"}
-  ]
+  "updates": {
+    "memberOf": [
+      {"groupId": "67c85954abe686cf9cb78b2e", "aaaManaged": false}
+    ],
+    "assignedRoles": [
+      {"roleId": "683fb3733324ad98536b8caa"}
+    ]
+  }
 }
 ```
-Note: `memberOf` and `assignedRoles` are full replacements — include ALL memberships.
+Note: `memberOf` and `assignedRoles` are full replacements — include ALL memberships. `updates` also accepts `inactive` and `email`.
 
 **Force logout:**
 ```
@@ -129,14 +130,19 @@ POST /authorization/groups
 ```
 ```json
 {
-  "name": "Network Operations",
-  "description": "Network ops team",
-  "memberOf": [],
-  "assignedRoles": [
-    {"roleId": "role-id-for-operations"}
-  ]
+  "group": {
+    "provenance": "Pronghorn",
+    "name": "Network Operations",
+    "description": "Network ops team",
+    "memberOf": [],
+    "assignedRoles": [
+      {"roleId": "role-id-for-operations"}
+    ],
+    "inactive": false
+  }
 }
 ```
+All six fields are required. `provenance` is where the group is managed — use the same value as the platform's existing groups (`Pronghorn` on a self-hosted platform; Itential Cloud groups show `CloudAAA`).
 
 **Group structure:**
 ```json
@@ -168,20 +174,24 @@ POST /authorization/roles
 ```
 ```json
 {
-  "name": "device-operator",
-  "description": "Can view and backup devices but not modify",
-  "allowedMethods": [
-    {"name": "getDevicesFiltered", "provenance": "ConfigurationManager"},
-    {"name": "getDeviceConfig", "provenance": "ConfigurationManager"},
-    {"name": "backUpDevice", "provenance": "ConfigurationManager"},
-    {"name": "getJobs", "provenance": "OperationsManager"},
-    {"name": "getJob", "provenance": "OperationsManager"},
-    {"name": "startJob", "provenance": "OperationsManager"}
-  ]
+  "role": {
+    "provenance": "Custom",
+    "name": "device-operator",
+    "description": "Can view and backup devices but not modify",
+    "allowedMethods": [
+      {"name": "getDevicesFiltered", "provenance": "ConfigurationManager"},
+      {"name": "getDeviceConfig", "provenance": "ConfigurationManager"},
+      {"name": "backUpDevice", "provenance": "ConfigurationManager"},
+      {"name": "getJobs", "provenance": "OperationsManager"},
+      {"name": "getJob", "provenance": "OperationsManager"},
+      {"name": "startJob", "provenance": "OperationsManager"}
+    ],
+    "allowedViews": []
+  }
 }
 ```
 
-Each `allowedMethods` entry grants access to a specific app method. `provenance` is the app name.
+All five fields are required. The role's own `provenance` is `Custom` for roles you create. Each `allowedMethods` entry grants access to a specific app method, where `provenance` is the app name; `allowedViews` entries (`{"provenance": "AgentProjects", "path": "/agent-projects/"}`) grant UI pages. To change a role later: `PATCH /authorization/roles/{id}` with `{updates: {description, allowedMethods, allowedViews}}`.
 
 ## OAuth Service Accounts
 
@@ -191,7 +201,7 @@ Service accounts for API-based automation (no interactive login, uses client_cre
 |--------|----------|-------------|
 | POST | `/oauth/serviceAccounts` | Create a service account |
 | GET | `/oauth/serviceAccounts` | List service accounts |
-| PATCH | `/oauth/serviceAccounts/{client_id}` | Update account (description, inactive) |
+| PATCH | `/oauth/serviceAccounts/{client_id}` | Update the description (`{updates: {description}}`) |
 | DELETE | `/oauth/serviceAccounts/{client_id}` | Delete a service account |
 | PATCH | `/oauth/serviceAccounts/{client_id}/regenerate` | Regenerate client secret |
 
@@ -237,9 +247,9 @@ PATCH /oauth/serviceAccounts/{client_id}/regenerate
 ```
 Returns the new `client_secret`. The old secret stops working immediately.
 
-**Deactivate (without deleting):**
+**Deactivate (without deleting):** the service-account endpoint only updates the description — deactivate through the account itself (`client_id` is its account `_id`):
 ```
-PATCH /oauth/serviceAccounts/{client_id}
+PATCH /authorization/accounts/{client_id}
 ```
 ```json
 {
@@ -255,9 +265,11 @@ PATCH /authorization/accounts/{client_id}
 ```
 ```json
 {
-  "memberOf": [
-    {"groupId": "group-id", "aaaManaged": false}
-  ]
+  "updates": {
+    "memberOf": [
+      {"groupId": "group-id", "aaaManaged": false}
+    ]
+  }
 }
 ```
 
@@ -274,18 +286,21 @@ PATCH /authorization/accounts/{client_id}
 | GET | `/sso/enabled` | Check if SSO is enabled |
 | GET | `/sso/test/{name}` | Test SSO configuration |
 
-**SAML configuration:**
+**SAML configuration** (`POST /sso/configs`; `PUT /sso/configs/{name}` takes the same body):
 ```json
 {
-  "name": "Okta SAML",
-  "ssoType": "saml",
-  "settings": {
-    "issuer": "Itential",
-    "loginURL": "https://idp.example.com/sso/saml",
-    "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+  "config": {
+    "name": "Okta SAML",
+    "ssoType": "saml",
+    "settings": {
+      "issuer": "Itential",
+      "loginURL": "https://idp.example.com/sso/saml",
+      "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+    }
   }
 }
 ```
+`name`, `ssoType` and `settings` are required. Activate or deactivate with `POST /sso/configs/{name}/active` and `{"active": true}` (or `false`).
 
 **Test SSO:**
 ```
@@ -462,20 +477,30 @@ The actual API data is in `body` (as a JSON string) — use a `query` task to ex
 ```
 POST /prebuilts/import
 ```
-Pass the full prebuilt JSON from export or repository.
+```json
+{
+  "prebuilt": {"metadata": {...}, "manifest": {...}, "bundles": [...], "readme": "..."},
+  "options": {"overwrite": false}
+}
+```
+`prebuilt` is the full JSON from `GET /prebuilts/{id}/export` or the repository.
 
 **Validate before import:**
 ```
 PUT /prebuilts/import/validation
 ```
-Check for conflicts before importing.
+Same `{"prebuilt": {...}}` body, without `options` — checks for conflicts before importing.
 
 ## Profiles
 
 Profiles save adapter/application configurations for different environments.
 
+A profile's `{id}` is its name (the `id` field in its properties).
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/profiles` | List profiles |
+| POST | `/profiles` | Create a profile |
 | GET | `/profiles/{id}` | Get a profile |
 | PUT | `/profiles/{id}` | Update a profile |
 | POST | `/profiles/import` | Import a profile |
@@ -486,9 +511,9 @@ Profiles save adapter/application configurations for different environments.
 
 **Activate a profile** (switch environment):
 ```
-PUT /profiles/{name}/active
+PUT /profiles/{id}/active
 ```
-This applies the profile's saved adapter/app configurations. Use for switching between dev/staging/prod.
+No body. This applies the profile's saved adapter/app configurations. Use for switching between dev/staging/prod.
 
 ## Admin Scenarios
 
@@ -498,13 +523,13 @@ This applies the profile's saved adapter/app configurations. Use for switching b
 2. Create a role with needed permissions: POST /authorization/roles
 3. Assign role to group: PATCH /authorization/groups/{id}
 4. User logs in via SSO → auto-provisioned
-5. Add to group: PATCH /authorization/accounts/{id}
+5. Add to group: PATCH /authorization/accounts/{id} {updates: {memberOf: [...]}}
 ```
 
 ### 2. Create a service account for CI/CD
 ```
 1. POST /oauth/serviceAccounts → save client_id and client_secret
-2. PATCH /authorization/accounts/{client_id} → add to group for permissions
+2. PATCH /authorization/accounts/{client_id} {updates: {memberOf: [...]}} → add to group for permissions
 3. Test: POST /oauth/token with client_credentials
 4. Use token for API calls
 ```

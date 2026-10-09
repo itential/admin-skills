@@ -40,7 +40,9 @@ rules or put credentials in committed files.
 - Accounts use `{results: [...], total: N}` shape — NOT `{data: [...]}`
 - Workflow engine activate/deactivate is `POST` (no body required)
 - **Rate limit can only be updated when workers are deactivated** — `POST /workflow_engine/deactivate` first, then update, then `POST /workflow_engine/activate`
-- **Log level change requires `transport` field** — not just `loglevel`. Valid transports: `file`, `console`, `syslog`
+- **Log level change uses a `properties` wrapper with `transport` and `level`** — `{"properties": {"transport": "file", "level": "debug"}}`, not `{"loglevel": ...}`. Transports: `file`, `console`, `syslog`
+- `GET /adapters/{name}/changelogs` returns HTTP 500 with "Release notes are available online…" on 6.5 — release notes live at docs.itential.com, not in the API
+- `GET /adapters/{name}/export` can fail with HTTP 500 (`Cannot read properties of undefined`); `GET /adapters/{name}` returns the same configuration (`name`, `type`, `model`, `properties`) and always works
 
 ## Health Monitoring
 
@@ -52,12 +54,16 @@ GET /health/server
 Returns: version, release, build, arch, platform, node version.
 ```json
 {
-  "version": "6.3.1",
-  "release": "6.3.1",
-  "build": "2025.93.19",
+  "version": "6.5.2",
+  "release": "6.5.2",
+  "build": "2025.114.11",
   "arch": "x64",
   "platform": "linux",
-  "versions": {"node": "20.19.5", ...}
+  "versions": {"node": "20.20.0", ...},
+  "uptime": 123456,
+  "memoryUsage": {...},
+  "cpuUsage": {...},
+  "dependencies": {...}
 }
 ```
 
@@ -68,7 +74,7 @@ Quick version check: `GET /version` → returns just the version string.
 ```
 GET /health/system
 ```
-Returns: arch, kernel, uptime, free/total memory, load average, CPU details.
+Returns OS-level stats: `arch`, `release` (kernel), `uptime`, `freemem`, `totalmem`, `loadavg`, `cpus`.
 
 ### Who am I?
 
@@ -88,11 +94,14 @@ GET /health/adapters
     {
       "id": "ServiceNow",
       "package_id": "@itentialopensource/adapter-servicenow",
+      "type": "Adapter",
+      "version": "...",
       "state": "RUNNING",
-      "connection": {"state": "online"},
-      "properties": {...}
+      "connection": {"state": "ONLINE"},
+      "uptime": 123456
     }
-  ]
+  ],
+  "total": 1
 }
 ```
 
@@ -100,7 +109,9 @@ Key fields:
 - `id` — instance name (use this for lifecycle commands)
 - `package_id` — adapter package
 - `state` — `RUNNING`, `STOPPED`, `ERROR`
-- `connection.state` — `online`, `offline`
+- `connection.state` — upper-case, e.g. `ONLINE` when the adapter can reach its system
+
+Adapter properties are not in the health response — use `GET /adapters/{name}`.
 
 Single adapter: `GET /health/adapters/{name}`
 
@@ -114,11 +125,14 @@ GET /health/applications
   "results": [
     {
       "id": "WorkFlowEngine",
+      "package_id": "@itential/app-workflow_engine",
+      "type": "Application",
       "state": "RUNNING",
       "description": "...",
       "version": "..."
     }
-  ]
+  ],
+  "total": 1
 }
 ```
 
@@ -135,8 +149,8 @@ Single application: `GET /health/applications/{name}`
 | PUT | `/adapters/{name}` | Update adapter configuration |
 | PUT | `/adapters/{name}/properties` | Update adapter properties only |
 | PUT | `/adapters/{name}/loglevel` | Change adapter log level |
-| GET | `/adapters/{name}/changelogs` | Get adapter change history |
-| GET | `/adapters/{name}/export` | Export adapter configuration |
+| GET | `/adapters/{name}/changelogs` | Change history — returns 500 on 6.5 (see Gotchas) |
+| GET | `/adapters/{name}/export` | Export adapter configuration — may return 500; use `GET /adapters/{name}` |
 | DELETE | `/adapters/{name}` | Delete an adapter |
 | POST | `/adapters/import` | Import adapter configuration |
 
@@ -169,10 +183,13 @@ PUT /adapters/ServiceNow/loglevel
 ```
 ```json
 {
-  "loglevel": "debug"
+  "properties": {
+    "transport": "file",
+    "level": "debug"
+  }
 }
 ```
-Values: `error`, `warn`, `info`, `debug`, `trace`, `spam`
+Levels for `file` and `console`: `error`, `warn`, `info`, `debug`, `trace`, `spam`. For `syslog`: `debug`, `info`, `warning`, `error`. `PUT /applications/{name}/loglevel` takes the same body.
 
 **Get adapter configuration schema:**
 ```
@@ -212,8 +229,8 @@ GET /workflow_engine/workers/status
 ```
 ```json
 {
-  "jobWorker": {"running": true, "clusterValue": "not defined", "localValue": "enabled"},
-  "taskWorker": {"running": true, "clusterValue": "not defined", "localValue": "enabled"}
+  "jobWorker": {"running": true, "clusterValue": "not defined", "localValue": "not defined", "startupValue": true},
+  "taskWorker": {"running": true, "clusterValue": "not defined", "localValue": "not defined", "startupValue": true}
 }
 ```
 
@@ -250,7 +267,7 @@ PUT /workflow_engine/workers/rate_limit
 ```
 GET /indexes
 ```
-Returns object keyed by collection name, each containing an `indexes` array.
+Returns an object keyed by collection name, each with `application` and an `indexes` array.
 
 ### Check index status
 
@@ -262,7 +279,7 @@ Shows which collections have pending index rebuilds.
 ```
 GET /indexes/{collection}/status
 ```
-Status for a specific collection.
+Status for one collection: `{"missing": [], "misnamed": [], "external": [], "indexed": 3, "total": 3, "collectionSize": 91391, "inProgress": false}` — rebuild when `missing` or `misnamed` isn't empty.
 
 ### Rebuild indexes
 
@@ -279,7 +296,18 @@ Triggers index rebuild for a collection. Use when queries are slow or after migr
 GET /customization/banner
 PUT /customization/banner
 ```
-Set a platform-wide banner message (e.g., "Maintenance window tonight 10pm-2am").
+Set a platform-wide banner message (e.g., "Maintenance window tonight 10pm-2am"). `GET` returns `{"result": {...}}`; `PUT` takes the banner itself — `text`, `active`, `startTime`, `dismissible` and `allPages` are required:
+```json
+{
+  "text": "Maintenance window tonight 10pm-2am",
+  "active": true,
+  "startTime": "2026-10-09T22:00:00.000Z",
+  "endTime": "2026-10-10T02:00:00.000Z",
+  "dismissible": true,
+  "allPages": true,
+  "backgroundColor": "#007dbc"
+}
+```
 
 ## Admin Scenarios
 
