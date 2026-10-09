@@ -1,24 +1,22 @@
 name: PR Labeler
 
-# Auto-labels a PR from its branch-name prefix so Release Drafter (release-drafter.yml)
-# can resolve the next version without anyone applying labels by hand.
+# Auto-labels a PR from its branch-name prefix, so Release Drafter (release-drafter.yml)
+# can group the release notes without anyone applying labels by hand.
 #
 # Mapping (see .github/release-drafter.yml and CONTRIBUTING.md):
-#   feature/  -> feature   (minor)
-#   fix/      -> fix       (patch)
-#   refactor/ -> refactor  (patch)
-#   docs/     -> documentation + skip-changelog (excluded from versioning)
-#   chore/    -> chore + skip-changelog         (excluded from versioning)
-#
-# major/breaking bumps are NEVER inferred here — that requires a human to apply the
-# `breaking-change` label explicitly. See "what counts as breaking" in CONTRIBUTING.md.
+#   feature/  -> feature
+#   fix/      -> fix
+#   refactor/ -> refactor
+#   docs/     -> documentation + skip-changelog (left out of release notes)
+#   chore/    -> chore + skip-changelog         (left out of release notes)
 #
 # Uses pull_request_target, not pull_request: the default GITHUB_TOKEN for a
 # fork-triggered `pull_request` event is read-only regardless of the `permissions:`
 # declared below, so labeling a fork PR would fail with "Resource not accessible by
-# integration". `pull_request_target` runs with the base repo's token permissions instead. This is safe here specifically because the job below never
-# checks out the PR's code — it only reads event metadata (PR number, branch name) — so
-# a malicious fork PR can't get its own code to run with elevated permissions.
+# integration". `pull_request_target` runs with the base repo's token permissions
+# instead. This is safe here because the job below never checks out the PR's code --
+# it only reads event metadata (PR number, branch name) -- so a fork PR can't get its
+# own code to run with elevated permissions.
 
 on:
   pull_request_target:
