@@ -76,7 +76,7 @@ An admin makes a private copy of this repo, the team commits markdown rules unde
 
 - [`docs/vendor-install.md`](docs/vendor-install.md) — install, run, update per tool
 - [`docs/customization.md`](docs/customization.md) — add your org's rules and keep them across updates
-- [`docs/multi-vendor-architecture.md`](docs/multi-vendor-architecture.md) — how `skills/` becomes each tool's copy, and the CI checks
+- [`docs/multi-vendor-architecture.md`](docs/multi-vendor-architecture.md) — how every harness installs from `skills/`, and the CI checks
 - [`AGENTS.md`](AGENTS.md) — the guide every agent reads first
 - [`CONTRIBUTING.md`](CONTRIBUTING.md) — branch and commit conventions
 - [`tests/`](tests/) — scripts that exercise the skills against a live platform
