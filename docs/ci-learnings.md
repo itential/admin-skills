@@ -1,5 +1,7 @@
 # CI learnings (itential/admin-skills sandbox, 2026-09-30)
 
+> **Update:** the per-tool copies (`.claude/skills`, `.agents/skills`, `.github/skills`) and the mirror pipeline were later removed — every installer reads `skills/` directly. Findings 4, 5 and 7 below describe that removed pipeline.
+
 This repo was used to exercise the builder-skills CI design on a real org repo with branch protection — something a private personal repo can't do. Each finding links to the PR or run where it showed up.
 
 ## Settings this repo runs with

@@ -32,8 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >-
       github.repository == 'itential/admin-skills' &&
-      !contains(github.event.head_commit.message, 'chore: bump version to') &&
-      !contains(github.event.head_commit.message, 'chore: regenerate vendor mirrors')
+      !contains(github.event.head_commit.message, 'chore: bump version to')
     steps:
       - uses: actions/checkout@v4
         with:

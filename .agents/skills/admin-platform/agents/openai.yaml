@@ -1,5 +1,0 @@
-# Codex skill metadata (display in /skills and the plugin UI).
-interface:
-  display_name: "Platform Administration"
-  short_description: "Check platform health and manage adapters, apps, engine and indexes"
-  default_prompt: "Check the health of my Itential platform and restart any adapter that's offline"
