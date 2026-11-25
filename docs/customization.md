@@ -119,7 +119,7 @@ When Itential publishes a release (**Watch → Custom → Releases** on `itentia
 git clone https://github.com/acme/admin-skills.git && cd admin-skills       # if you don't have it locally
 git remote add upstream https://github.com/itential/admin-skills.git        # once
 git fetch upstream --tags
-git merge v0.2.0          # a release tag — or `git merge upstream/main` for the latest unreleased changes
+git merge v0.3.0          # a release tag — or `git merge upstream/main` for the latest unreleased changes
 git push
 ```
 
