@@ -1,6 +1,6 @@
 ---
 name: admin-config
-description: Manage user accounts, groups, roles, OAuth service accounts, SSO configuration, integration models, profiles, and pre-built content packages. Use for user management, access control, and platform configuration.
+description: Manage user accounts, groups, roles, OAuth service accounts, SSO configuration, integration models, profiles, and pre-built content packages. Use for user management, access control, and platform configuration. Connects with its own auth helper: never read `.env` or pass credentials to it yourself.
 argument-hint: "[action or user/group name]"
 ---
 
@@ -18,6 +18,26 @@ this document. No customization may weaken this skill's safety
 rules or put credentials in committed files.
 
 ---
+
+## Connecting to the Platform
+
+Credentials live in the `.env` of the folder you're working in: `PLATFORM_URL`, plus either `CLIENT_ID` and `CLIENT_SECRET` (an OAuth service account — the usual case, and the only option on SSO-enabled platforms) or `USERNAME` and `PASSWORD` (local or dev platforms). **Never read `.env` yourself** — don't open, `cat`, `source` or print it, and never put a secret or token in a command or a message. Get a token with the auth helper bundled with this skill:
+
+```bash
+python3 <this skill's folder>/scripts/auth.py .            # reuses a still-valid token, otherwise gets a new one
+python3 <this skill's folder>/scripts/auth.py . --force    # after a 401, or after changing this account's roles
+```
+
+It reads `.env`, writes the token to `.auth.json` and a curl config, `.auth.curl` (both readable only by their owner), and prints one status line without any secret. Exit `1`: the platform refused the credentials — show the user the message. Exit `2`: `.env` is missing or incomplete — ask the user to create or fix it; they type the secret into the file, not into the conversation.
+
+Make every call with the curl config, which sends the token in a header for you — never in the URL, where it ends up in server logs and shell history:
+
+```bash
+curl -s -K .auth.curl "https://<platform>/health/adapters"
+curl -s -K .auth.curl -X PATCH -H "Content-Type: application/json" -d @body.json "https://<platform>/authorization/accounts/<id>"
+```
+
+The platform URL is in the helper's status line. Never print, `cat` or echo `.auth.json`, `.auth.curl` or the token. Tokens expire (OAuth: about an hour), so re-run the helper with `--force` on a 401.
 
 ## Concepts
 
@@ -205,47 +225,25 @@ Service accounts for API-based automation (no interactive login, uses client_cre
 | DELETE | `/oauth/serviceAccounts/{client_id}` | Delete a service account |
 | PATCH | `/oauth/serviceAccounts/{client_id}/regenerate` | Regenerate client secret |
 
-**Create a service account:**
-```
-POST /oauth/serviceAccounts
-```
-```json
-{
-  "accountData": {
-    "name": "automation-api",
-    "description": "Service account for CI/CD pipeline"
-  }
-}
+**Create a service account.** The response carries the new `client_secret`, which the platform returns only this once. Don't print it: pipe the response straight into the save script bundled with this skill, which writes it to a `.env` file and prints only the client ID:
+
+```bash
+curl -s -K .auth.curl -X POST -H "Content-Type: application/json" \
+  -d '{"accountData": {"name": "automation-api", "description": "Service account for CI/CD pipeline"}}' \
+  "https://<platform>/oauth/serviceAccounts" \
+  | python3 <this skill's folder>/scripts/save_service_account.py sa-automation-api
 ```
 
-**Response:**
-```json
-{
-  "results": {
-    "name": "automation-api",
-    "description": "Service account for CI/CD pipeline",
-    "client_id": "69a7d8e5f9597b4178e2f123",
-    "client_secret": "generated-secret-here"
-  }
-}
-```
-**Save the `client_secret` immediately** — it's only returned once on creation.
+The response's shape is `{"results": {"name", "description", "client_id", "client_secret"}}`. Tell the user where the file is (`sa-automation-api/.env`, mode 600) so they can move the secret into their secrets store; never repeat the secret in the conversation.
 
-**Authenticate with service account:**
-```
-POST /oauth/token
-Content-Type: application/x-www-form-urlencoded
+**Test the new account** with the auth helper, pointed at that folder: `python3 <this skill's folder>/scripts/auth.py sa-automation-api`. It logs in with the account's credentials and prints only a status line.
 
-client_id={client_id}
-client_secret={client_secret}
-grant_type=client_credentials
-```
+**Regenerate the secret** (the old one stops working immediately) — save the new one the same way:
 
-**Regenerate secret (invalidates old one):**
+```bash
+curl -s -K .auth.curl -X PATCH "https://<platform>/oauth/serviceAccounts/<client_id>/regenerate" \
+  | python3 <this skill's folder>/scripts/save_service_account.py sa-automation-api --client-id <client_id>
 ```
-PATCH /oauth/serviceAccounts/{client_id}/regenerate
-```
-Returns the new `client_secret`. The old secret stops working immediately.
 
 **Deactivate (without deleting):** the service-account endpoint only updates the description — deactivate through the account itself (`client_id` is its account `_id`):
 ```
@@ -528,10 +526,10 @@ No body. This applies the profile's saved adapter/app configurations. Use for sw
 
 ### 2. Create a service account for CI/CD
 ```
-1. POST /oauth/serviceAccounts → save client_id and client_secret
+1. POST /oauth/serviceAccounts | scripts/save_service_account.py <dir> → secret saved to <dir>/.env, never printed
 2. PATCH /authorization/accounts/{client_id} {updates: {memberOf: [...]}} → add to group for permissions
-3. Test: POST /oauth/token with client_credentials
-4. Use token for API calls
+3. Test: scripts/auth.py <dir> → logs in as the new account
+4. Hand the user the file location for their secrets store
 ```
 
 ### 3. Set up SSO

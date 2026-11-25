@@ -2,7 +2,7 @@
 
 Before your first pull request, sign the [Contributor License Agreement](CLA.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues privately — see [SECURITY.md](SECURITY.md).
 
-Pull requests into `main` must pass **Skills Valid**, **Manifest Versions** and **Custom folders empty** (see `.github/workflows/`). **Branch Naming** also runs and reports, but doesn't block a merge.
+Pull requests into `main` must pass **Skills Valid**, **Manifest Versions**, **Custom folders empty**, **Security Rules**, **Workflow Security** and **CodeQL** (see `.github/workflows/`). **Branch Naming** also runs and reports, but doesn't block a merge.
 
 ## Branch names
 
@@ -21,6 +21,12 @@ PRs are squash-merged, so the PR title becomes the commit on `main` and the line
 - Don't change versions in a normal PR. Releases are cut by a maintainer — see **Releasing** below.
 
 Before pushing, run `python3 scripts/check-skills.py` — the same check CI runs.
+
+## Security checks
+
+The skills are instructions an AI follows with your credentials on your platform, so most security problems here are in Markdown, not code. **Security Rules** (`scripts/check-security-rules.py`) fails a PR whose skill text or scripts do what the rules don't allow: a token in a URL (`?token=`), instructions that have the agent read `.env`, a command the agent builds with a secret in it, a secret taken as a command-line argument or typed in front of a command, `curl … \| sh`, `npx -y`, or Configuration Manager remediation tasks. **Workflow Security** (zizmor) checks the GitHub Actions workflows, and **CodeQL** the scripts and workflows. OpenSSF Scorecard grades the repo weekly (the README badge), and Dependabot keeps the actions' commit-SHA pins current.
+
+Run the rules before pushing: `python3 scripts/check-security-rules.py` (`--list` shows them). A sentence that *explains* a rule ("never use `?token=`") passes. If a match is genuinely safe, put `security-rules: allow <rule-id>` on that line and say why in the PR. When a security problem turns up that the rules missed, add a rule for it in the same PR as the fix. The rules are shared with builder-skills — keep the copies in step.
 
 ## Changelog
 

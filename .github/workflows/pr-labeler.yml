@@ -19,7 +19,7 @@ name: PR Labeler
 # own code to run with elevated permissions.
 
 on:
-  pull_request_target:
+  pull_request_target: # zizmor: ignore[dangerous-triggers] -- safe: no checkout of PR code, branch name passed via env
     types: [opened, reopened, synchronize]
     branches: [main]
 

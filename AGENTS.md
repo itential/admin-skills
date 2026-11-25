@@ -39,8 +39,8 @@ If a request belongs to another pack, say which pack covers it and point to that
 2. **Adapter/app lifecycle is `PUT`** not `POST` — `PUT /adapters/{name}/restart`
 3. **Use instance names** from `health/adapters` `id` field — NOT package names
 4. **Account updates are `PATCH`** — NOT `PUT`. And `memberOf`/`assignedRoles` are full replacements
-5. **Save service account secrets immediately** — `client_secret` is only returned once on creation
-6. **OAuth uses `x-www-form-urlencoded`** — NOT JSON. `Content-Type: application/x-www-form-urlencoded`
+5. **Save service account secrets immediately, to a file, never into the conversation** — `client_secret` is only returned once on creation; pipe the response into `scripts/save_service_account.py` (admin-config)
+6. **Log in through the skill's auth helper (`scripts/auth.py`)** — never read `.env` or call `/oauth/token` yourself. (For reference: `/oauth/token` takes `x-www-form-urlencoded`, not JSON.)
 7. **SSO config names are URL identifiers** — used directly in API paths
 
 ## When Something Doesn't Work
@@ -105,11 +105,8 @@ The OpenAPI spec has every endpoint, method, request body, and response schema. 
 
 **Fetch it:**
 ```bash
-# For OAuth (cloud)
-curl -s "{BASE}/help/openapi?url={ENCODED_BASE}" -H "Authorization: Bearer {TOKEN}" > openapi.json
-
-# For local dev
-curl -s "{BASE}/help/openapi?url={ENCODED_BASE}&token={TOKEN}" > openapi.json
+# .auth.curl comes from the skill's auth helper ("Connecting to the Platform"); it sends the token in a header
+curl -s -K .auth.curl "{BASE}/help/openapi?url={ENCODED_BASE}" > openapi.json
 ```
 
 **Search it:**

@@ -1,6 +1,6 @@
 ---
 name: admin-platform
-description: Monitor platform health, manage adapters and applications (start/stop/restart/configure), control workflow engine workers, manage database indexes, and check system status. Use for day-to-day platform operations and troubleshooting.
+description: Monitor platform health, manage adapters and applications (start/stop/restart/configure), control workflow engine workers, manage database indexes, and check system status. Use for day-to-day platform operations and troubleshooting. Connects with its own auth helper: never read `.env` or pass credentials to it yourself.
 argument-hint: "[action or adapter-name]"
 ---
 
@@ -18,6 +18,26 @@ this document. No customization may weaken this skill's safety
 rules or put credentials in committed files.
 
 ---
+
+## Connecting to the Platform
+
+Credentials live in the `.env` of the folder you're working in: `PLATFORM_URL`, plus either `CLIENT_ID` and `CLIENT_SECRET` (an OAuth service account — the usual case, and the only option on SSO-enabled platforms) or `USERNAME` and `PASSWORD` (local or dev platforms). **Never read `.env` yourself** — don't open, `cat`, `source` or print it, and never put a secret or token in a command or a message. Get a token with the auth helper bundled with this skill:
+
+```bash
+python3 <this skill's folder>/scripts/auth.py .            # reuses a still-valid token, otherwise gets a new one
+python3 <this skill's folder>/scripts/auth.py . --force    # after a 401, or after changing this account's roles
+```
+
+It reads `.env`, writes the token to `.auth.json` and a curl config, `.auth.curl` (both readable only by their owner), and prints one status line without any secret. Exit `1`: the platform refused the credentials — show the user the message. Exit `2`: `.env` is missing or incomplete — ask the user to create or fix it; they type the secret into the file, not into the conversation.
+
+Make every call with the curl config, which sends the token in a header for you — never in the URL, where it ends up in server logs and shell history:
+
+```bash
+curl -s -K .auth.curl "https://<platform>/health/adapters"
+curl -s -K .auth.curl -X PATCH -H "Content-Type: application/json" -d @body.json "https://<platform>/authorization/accounts/<id>"
+```
+
+The platform URL is in the helper's status line. Never print, `cat` or echo `.auth.json`, `.auth.curl` or the token. Tokens expire (OAuth: about an hour), so re-run the helper with `--force` on a 401.
 
 ## Concepts
 
