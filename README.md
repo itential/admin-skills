@@ -1,6 +1,7 @@
 # Itential — Admin Skills
 
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/itential/admin-skills/badge)](https://scorecard.dev/viewer/?uri=github.com/itential/admin-skills)
 
 AI agent skills for **administering the Itential Platform**: platform health, adapter and application lifecycle, workflow-engine control, users, groups, roles, service accounts, SSO, integrations and pre-built content. Works in Claude Code, Codex CLI, GitHub Copilot (CLI and VS Code) and Cursor.
 

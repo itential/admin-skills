@@ -5,6 +5,10 @@ release tag — what every tool's update installs.
 
 ## Unreleased
 
+- Added an auth helper (`scripts/auth.py` in each skill) and a "Connecting to the Platform" section to both skills: the helper reads `.env`, gets a token, writes `.auth.json` and a curl config `.auth.curl` (both mode 600) and prints one status line, and every call uses `curl -K .auth.curl`, so the agent never reads `.env` or puts a secret or token in a command. Before, the skills didn't say how to log in, and in a test on a live platform one model read `.env` and put the client secret in its commands. Both skill descriptions also tell the agent not to read `.env`
+- Added `save_service_account.py` (admin-config): creating a service account or regenerating its secret pipes the response into it, which writes the secret straight to a `.env` file and prints only the client ID; the new account is then tested with the auth helper. Before, the skill showed the secret in the conversation
+- Fixed the `openapi.json` fetch in `AGENTS.md`, which sent local tokens as a `?token=` URL parameter
+
 ## 0.2.0
 
 - Fixed request bodies in `admin-config` that the platform rejects: account, role and service-account updates use `{updates: {...}}`; role, group and SSO creation use `{role}`, `{group}` and `{config}` wrappers with their required fields; prebuilt import uses `{prebuilt, options}`; service accounts are deactivated through their account
